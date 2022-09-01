@@ -28,7 +28,7 @@ Open [http://localhost:8000](http://localhost:8000) with your browser to see the
 
 **You can define them in .env for local development.**
 
-- REACT_APP_NOT_WEATHERAPI=
+- NEXT_PUBLIC_WEATHERAPI=
 
 ### List of API 
 
