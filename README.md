@@ -1,10 +1,11 @@
 # Next.js projects with multiple API CALL
 
-The main goal of that projects is to practice working with REST API.
-By using two separate APIs together to completed task from description.
+The main goal of that project is to practice working with REST API.
+By using two separate APIs together to complete tasks from description.
 
 
 Additionally, I created navigation between tasks to make the project clearer and more readable.
+
 
 
 ## Run Locally
