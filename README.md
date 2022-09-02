@@ -3,10 +3,19 @@
 The main goal of that project is to practice working with REST API.
 By using two separate APIs together to complete tasks from description.
 
-
 Additionally, I created navigation between tasks to make the project clearer and more readable.
 
+## DEMO Link
 
+[Demo](https://curious-brioche-ee3e50.netlify.app/)
+
+## Focusing on :
+- Practicing working with more than one REST API calls 🚀
+- Fetching Data 🚀
+- Conditional Loading Message 🚀
+- Handling Fetch Errors 🚀
+- Added navigation between tasks  🚀
+- Not focusing on styles 🚀
 
 ## Run Locally
 
