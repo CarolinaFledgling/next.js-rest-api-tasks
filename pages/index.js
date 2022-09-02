@@ -120,9 +120,13 @@ export default function Home() {
           <p >
             Task nr 1
           </p>
-          <p>Create input  where you will write the random name of the country and you will show the weather for that country&apos;s capital
-            e.g, I will write : Poland
-            I should get Warsaw and the weather  information for the capital.</p>
+          <p>Create input  where you will write the random name of the country</p>
+            <p> After entering the name fo the country you should get:</p>
+            <ul>
+              <li>Capital of the country</li>
+              <li>Weather information</li>
+            </ul>
+           <p>e.g, Enter: Poland  result: Warsaw Clouds</p>
         </div>
         <div>
           <form>
