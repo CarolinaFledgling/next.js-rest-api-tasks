@@ -4,12 +4,13 @@ import React, { useState, useEffect } from 'react';
 export default function Task3() {
     const [valueInput, setValueInput] = useState("")
     const [citiesAndPopulationData, setCitiesAndPopulationData] = useState([])
-    const [error, setError] = useState(false)
-    const [fetchError, setFetchError] = useState(false)
+    const [error, setError] = useState(null)
+
 
 
 
     const [foundCities, setFoundCities] = useState([])
+    const [cityWeatherInfo, setCityWeatherInfo] = useState([])
 
 
 
@@ -18,8 +19,50 @@ export default function Task3() {
     }
 
 
+    const getTemperatureInfo = (cities) => {
+
+        cities.forEach((city) => {
+            console.log('city api', city)
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${process.env.NEXT_PUBLIC_WEATHERAPI}`)
+                .then((res) => {
+
+                    if (!res.ok) {
+                        throw Error('problem with fetch in the Weather API')
+                    }
+                    return res.json()
+                })
+                .then((weatherData) => {
+                    console.log('seCityWeatherInfo', { weatherData })
+                    setCityWeatherInfo((prevArr) => {
+                        return [
+                            ...prevArr,
+                            {
+                                city,
+                                temp: weatherData.main.temp,
+                            }
+
+                        ]
+                    })
 
 
+                })
+                .catch((err) => {
+                    console.log(err.message)
+                    setError(err.message)
+                })
+        })
+
+    }
+
+
+    useEffect(() => {
+        if (foundCities) {
+            getTemperatureInfo(foundCities)
+        }
+    }, [foundCities])
+
+
+    console.log("cityWeatherInfo", cityWeatherInfo)
 
 
     const getCitiesAndPopulationData = () => {
@@ -68,12 +111,12 @@ export default function Task3() {
         });
 
 
-        const citiesByCountry = foundCitiesFromAPI.map((item) => {
+        const citiesByCountry = foundCitiesFromAPI.slice(0, 10).map((item) => {
             //console.log('city ', item.city)
             return item.city
         })
 
-        console.log('sorted cities', { citiesByCountry })
+        //console.log('sorted cities', { citiesByCountry })
         setFoundCities(citiesByCountry)
 
     }
@@ -82,8 +125,8 @@ export default function Task3() {
         <div className={styles.container}>
             <main className={styles.main}>
                 <div className={styles.description}>
-                    <p>Enter the country and list the top 10 biggest cities. </p>
-                    <p>Show the temperature in these 10 cities.</p>
+                    <p>Enter the country and list the biggest cities. </p>
+                    <p>Show the temperature in these cities.</p>
                     <p>Display one city with the highest temperature.</p>
                 </div>
                 <form>
@@ -95,15 +138,15 @@ export default function Task3() {
                     <button onClick={handleSubmitForm}>Submit</button>
 
                     <ul>
-                        {foundCities.slice(0, 10).map((city, index) => {
-                            return <li key={`city-${index}`}>{city}</li>
+                        {cityWeatherInfo.map((item, index) => {
+                            return <li key={`city-${index}`}>{item.city} temperature {item.temp}</li>
 
                         })}
                     </ul>
 
 
-                    {error && <p>Please write the name of country </p>}
-                    {fetchError && <p>Something went wrong with API Call </p>}
+                    {error && <p>{error}</p>}
+
                 </form>
 
 

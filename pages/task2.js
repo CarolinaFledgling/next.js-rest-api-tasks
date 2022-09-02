@@ -77,7 +77,6 @@ export default function Task2() {
                     // catch any kind of network error
                     // we cant connect to the server
                     console.log("network error", err.message)
-
                     setError(err.message)
                 })
         })
