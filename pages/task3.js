@@ -5,6 +5,7 @@ export default function Task3() {
     const [valueInput, setValueInput] = useState("")
     const [citiesAndPopulationData, setCitiesAndPopulationData] = useState([])
     const [error, setError] = useState(null)
+    const [fetchError, setFetchError] = useState(false)
 
 
 
@@ -43,7 +44,7 @@ export default function Task3() {
 
                         ]
                     })
-
+                    setError(null)
 
                 })
                 .catch((err) => {
@@ -74,7 +75,9 @@ export default function Task3() {
                 return res.json()
             })
             .then((data) => {
+                setFetchError(false)
                 return setCitiesAndPopulationData(data)
+
             })
             .catch((err) => {
                 console.log(err.message)
@@ -91,6 +94,8 @@ export default function Task3() {
 
     const handleSubmitForm = (e) => {
         e.preventDefault()
+
+        setCityWeatherInfo([])
 
         // important filter  return true when is true that item is going to array
         // The filter () function returns a new array that contains the filtered elements
