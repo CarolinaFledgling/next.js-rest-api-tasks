@@ -7,7 +7,7 @@ export default function Task2() {
     const [randomCapitalsfromAPI, setRandomCapitalsFromAPI] = useState([])
     const [randomWeatherArrCapitals, setRandomWeatherArrCapitals] = useState([])
     const [error, setError] = useState(null)
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
         console.log('Weather data: ', randomWeatherArrCapitals);
@@ -29,13 +29,14 @@ export default function Task2() {
             .then((data) => {
 
                 setDataCountriesApi(data)
+                setIsLoading(false)
                 setError(null)
 
             })
             .catch((err) => {
                 setError(err.message)
             })
-    }
+         }
 
 
     const getWeatherForRandom10Capitals = (capitalArray) => {
@@ -69,7 +70,7 @@ export default function Task2() {
                                     }
                                 ]
                             })
-
+                            setIsLoading(false)
                             setError(null)
                         })
                 }).catch((err) => {
@@ -136,6 +137,7 @@ export default function Task2() {
                 <div>
                     <form>
                         <button onClick={handleRandomTenCities}>Random</button>
+                        {isLoading && <div>Loading...</div>}
                         <div >
                             <h2>Random cities and their weather</h2>
                             <ul>

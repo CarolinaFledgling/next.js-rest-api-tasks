@@ -1,14 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head'
-import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 
 export default function Home() {
   const [valueInput, setValueInput] = useState("")
   const [dataCountriesApi, setDataCountriesApi] = useState([])
   const [error, setError] = useState(false)
-  const [status, setStatus] = useState(false)
+  const [fetchError, setFetchError] = useState(false)
 
 
   const [capital, setCapital] = useState("")
@@ -26,23 +25,26 @@ export default function Home() {
     fetch('https://countriesnow.space/api/v0.1/countries/capital')
       .then((res) => {
         if (!res.ok) {
-          setStatus(true)
+          throw Error('Could not fetch data')
         }
         return res.json()
       })
       .then((data) => {
-
         return setDataCountriesApi(data)
+      })
+      .catch((err) => {
+        console.log(err.message)
+        setFetchError(true)
       })
   }
 
-    // Second API to get Weather info
+  // Second API to get Weather info
   const getWeather = (providedCapital) => {
-    console.log('getWeather', { providedCapital });
+    //console.log('getWeather', { providedCapital });
     fetch(`https://api.openweathermap.org/data/2.5/weather?q=${providedCapital}&appid=${process.env.NEXT_PUBLIC_WEATHERAPI}`)
       .then((res) => {
         if (!res.ok) {
-          setStatus(true)
+          throw Error('Could not fetch data')
         }
         return res.json()
       })
@@ -53,11 +55,13 @@ export default function Home() {
         })
         console.log('weatherDetails: ', weatherDetails);
         setWeatherInfo(weatherDetails);
-        console.log(weatherDetails);
+        //console.log(weatherDetails);
+        setFetchError(false)
 
       })
       .catch((err) => {
         console.log("error", err)
+        setFetchError(true)
       })
   }
 
@@ -65,8 +69,7 @@ export default function Home() {
     getCapital()
   }, [])
 
-  console.log("Data from first API", { dataDetailsList: dataCountriesApi.data })
-
+  //console.log("Data from first API", { dataDetailsList: dataCountriesApi.data })
 
   useEffect(() => {
     if (capital) {
@@ -85,22 +88,18 @@ export default function Home() {
       setError(false)
     }
 
-
-
-
     const dataApi = dataCountriesApi?.data
     //Find the value of the first element
     const foundCountry = dataApi?.find((item) => {
       const countryFromApi = item.name
-      console.log(countryFromApi)
+      //console.log(countryFromApi)
       if (valueInput.toLowerCase() === countryFromApi.toLowerCase()) {
         return true;
       }
       return false;
     })
 
-    console.log('find capital', foundCountry?.capital)
-
+    //console.log('find capital', foundCountry?.capital)
     setCapital(foundCountry?.capital);
   }
 
@@ -117,12 +116,11 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        
         <div className={styles.description}>
           <p >
             Task nr 1
           </p>
-          <p>Create input  where you will write the random name of the country and you will show the weather for that country's capital
+          <p>Create input  where you will write the random name of the country and you will show the weather for that country&apos;s capital
             e.g, I will write : Poland
             I should get Warsaw and the weather  information for the capital.</p>
         </div>
@@ -138,7 +136,7 @@ export default function Home() {
             {weatherInfo && <p>{weatherInfo}</p>}
 
             {error && <p>Please write the name of country </p>}
-            {status && <p>Something went wrong with API Call </p>}
+            {fetchError && <p>Something went wrong with API Call </p>}
           </form>
         </div>
       </main>
