@@ -18,7 +18,10 @@ export default function Task3() {
     }
 
 
-    // First API to get Country
+
+
+
+
     const getCitiesAndPopulationData = () => {
         fetch('https://countriesnow.space/api/v0.1/countries/population/cities')
             .then((res) => {
@@ -46,28 +49,32 @@ export default function Task3() {
     const handleSubmitForm = (e) => {
         e.preventDefault()
 
+        // important filter  return true when is true that item is going to array
+        // The filter () function returns a new array that contains the filtered elements
+
         const isTheSameCountry = (value) => {
             //console.log("value", value.country)
-
-            if (valueInput.toLowerCase() === value.country.toLowerCase()) {
-                return value.city
-
-            }
+            return valueInput.toLowerCase() === value.country.toLowerCase()
         }
         const foundCitiesFromAPI = citiesAndPopulationData.data.filter(isTheSameCountry)
 
-        console.log('find cities for entered country', { foundCitiesFromAPI })
 
+
+        foundCitiesFromAPI.sort(function (elementA, elementB) {
+            const populationA = Number(elementA.populationCounts[0].value)
+            const populationB = Number(elementB.populationCounts[0].value)
+            return populationB - populationA
+
+        });
 
 
         const citiesByCountry = foundCitiesFromAPI.map((item) => {
-            console.log('city ', item.city)
+            //console.log('city ', item.city)
             return item.city
         })
 
+        console.log('sorted cities', { citiesByCountry })
         setFoundCities(citiesByCountry)
-
-
 
     }
 
@@ -75,8 +82,9 @@ export default function Task3() {
         <div className={styles.container}>
             <main className={styles.main}>
                 <div className={styles.description}>
-                    <p>Enter country and List the top 10 cities, calculate the highest temperature in these 10.</p>
-                    <p>Display one  city with the highest temperature</p>
+                    <p>Enter the country and list the top 10 biggest cities. </p>
+                    <p>Show the temperature in these 10 cities.</p>
+                    <p>Display one city with the highest temperature.</p>
                 </div>
                 <form>
                     <p>Check the weather of {valueInput}</p>
