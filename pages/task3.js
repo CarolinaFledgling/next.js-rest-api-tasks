@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from '../styles/Home.module.css'
 
-export default function task3() {
+export default function Task3() {
     return (
         <div className={styles.container}>
         <main className={styles.main}>

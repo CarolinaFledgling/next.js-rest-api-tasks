@@ -47,8 +47,6 @@ export default function Home() {
         return res.json()
       })
       .then((data) => {
-
-
         console.log('weatherDataApi details: ', { data, dataName: data.name, dataWeather: data.weather });
         const weatherDetails = data.weather.map((detail) => {
           return detail.main;
@@ -119,6 +117,7 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
+        
         <div className={styles.description}>
           <p >
             Task nr 1
