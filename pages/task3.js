@@ -22,12 +22,30 @@ export default function Task3() {
 
     const getTemperatureInfo = (cities) => {
 
-        cities.forEach((city) => {
-            console.log('city api', city)
-            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${process.env.NEXT_PUBLIC_WEATHERAPI}`)
+    //
+        cities.forEach((city, index) => {
+            // displaying city first before fetching weather data
+            setCityWeatherInfo((prevArr) => {
+                prevArr[index] = {
+                    city,
+                }
+                return [...prevArr];
+
+            })
+
+            console.log('city api', city, index)
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${process.env.NEXT_PUBLIC_WEATHERAPI}`)
                 .then((res) => {
 
                     if (!res.ok) {
+                        setCityWeatherInfo((prevArr) => {
+                            prevArr[index] = {
+                                city,
+                                status: 'Not found'
+                            }
+                            return [...prevArr];
+
+                        })
                         throw Error('problem with fetch in the Weather API')
                     }
                     return res.json()
@@ -35,14 +53,12 @@ export default function Task3() {
                 .then((weatherData) => {
                     console.log('seCityWeatherInfo', { weatherData })
                     setCityWeatherInfo((prevArr) => {
-                        return [
-                            ...prevArr,
-                            {
-                                city,
-                                temp: weatherData.main.temp,
-                            }
+                        prevArr[index] = {
+                            city,
+                            temp: weatherData.main.temp,
+                        }
+                        return [...prevArr];
 
-                        ]
                     })
                     setError(null)
 
@@ -132,7 +148,6 @@ export default function Task3() {
                 <div className={styles.description}>
                     <p>Enter the country and list the biggest cities. </p>
                     <p>Show the temperature in these cities.</p>
-                    <p>Display one city with the highest temperature.</p>
                 </div>
                 <form>
                     <p>Check the weather of {valueInput}</p>
@@ -142,14 +157,7 @@ export default function Task3() {
                     </div>
                     <button onClick={handleSubmitForm}>Submit</button>
 
-                    <ul>
-                        {cityWeatherInfo.map((item, index) => {
-                            return <li key={`city-${index}`}>{item.city} temperature {item.temp}</li>
-
-                        })}
-                    </ul>
-
-
+                    <CitiesList cityWeatherInfo={cityWeatherInfo} />
                     {error && <p>{error}</p>}
 
                 </form>
@@ -161,3 +169,14 @@ export default function Task3() {
         </div>
     )
 }
+function CitiesList({ cityWeatherInfo }) {
+    return <ul>
+        {cityWeatherInfo.map((item, index) => {
+            const temp = Math.round(item?.temp)
+            const status = item?.status;
+            return status ? <li key={`city-${index}`}>{item?.city} Failed: {status}</li> : <li key={`city-${index}`}>{item?.city} temperature {temp} °C</li>;
+
+        })}
+    </ul>;
+}
+

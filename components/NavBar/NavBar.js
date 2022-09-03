@@ -3,7 +3,7 @@ import React from 'react'
 import { useRouter } from "next/router";
 import NavigationLink from '../NavigationLink/NavigationLink';
 
-const navigationRoutes = ['task1', 'task2', 'task3']
+const navigationRoutes = ['task1', 'task2', 'task3', 'task4']
 
 export const NavBar = () => {
     const router = useRouter()
