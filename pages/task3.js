@@ -6,12 +6,43 @@ export default function Task3() {
     const [citiesAndPopulationData, setCitiesAndPopulationData] = useState([])
     const [error, setError] = useState(null)
     const [fetchError, setFetchError] = useState(false)
-
-
-
-
+    const [isSortbyTemp, setIsSortByTemp] = useState(false)
     const [foundCities, setFoundCities] = useState([])
     const [cityWeatherInfo, setCityWeatherInfo] = useState([])
+
+
+
+
+
+
+
+
+
+    const findCities = () => {
+
+        // important filter  return true when is true that item is going to array
+        // The filter () function returns a new array that contains the filtered elements
+        const isTheSameCountry = (value) => {
+            //console.log("value", value.country)
+            return valueInput.toLowerCase() === value.country.toLowerCase()
+        }
+        const foundCitiesFromAPI = citiesAndPopulationData.data.filter(isTheSameCountry)
+        foundCitiesFromAPI.sort(function (elementA, elementB) {
+            const populationA = Number(elementA.populationCounts[0].value)
+            const populationB = Number(elementB.populationCounts[0].value)
+            return populationB - populationA
+
+        });
+
+
+        const citiesByCountry = foundCitiesFromAPI.slice(0, 10).map((item) => {
+            //console.log('city ', item.city)
+            return item.city
+        })
+
+        //console.log('sorted cities', { citiesByCountry })
+        setFoundCities(citiesByCountry)
+    }
 
 
 
@@ -21,8 +52,6 @@ export default function Task3() {
 
 
     const getTemperatureInfo = (cities) => {
-
-    //
         cities.forEach((city, index) => {
             // displaying city first before fetching weather data
             setCityWeatherInfo((prevArr) => {
@@ -76,10 +105,10 @@ export default function Task3() {
         if (foundCities) {
             getTemperatureInfo(foundCities)
         }
-    }, [foundCities])
+    }, [foundCities, isSortbyTemp])
 
 
-    console.log("cityWeatherInfo", cityWeatherInfo)
+    //console.log("cityWeatherInfo", cityWeatherInfo)
 
 
     const getCitiesAndPopulationData = () => {
@@ -108,37 +137,25 @@ export default function Task3() {
 
     //console.log("CitiesAndPopulationData", { citiesAndPopulationData: citiesAndPopulationData.data })
 
-    const handleSubmitForm = (e) => {
+
+    const handleSortbyPopulation = (e) => {
         e.preventDefault()
+        setCityWeatherInfo([])
+
+        findCities()
+
+        setIsSortByTemp(false)
+
+    }
+
+    const handleSortByTemperature = (e) => {
+        e.preventDefault()
+
+        setIsSortByTemp(true)
 
         setCityWeatherInfo([])
 
-        // important filter  return true when is true that item is going to array
-        // The filter () function returns a new array that contains the filtered elements
-
-        const isTheSameCountry = (value) => {
-            //console.log("value", value.country)
-            return valueInput.toLowerCase() === value.country.toLowerCase()
-        }
-        const foundCitiesFromAPI = citiesAndPopulationData.data.filter(isTheSameCountry)
-
-
-
-        foundCitiesFromAPI.sort(function (elementA, elementB) {
-            const populationA = Number(elementA.populationCounts[0].value)
-            const populationB = Number(elementB.populationCounts[0].value)
-            return populationB - populationA
-
-        });
-
-
-        const citiesByCountry = foundCitiesFromAPI.slice(0, 10).map((item) => {
-            //console.log('city ', item.city)
-            return item.city
-        })
-
-        //console.log('sorted cities', { citiesByCountry })
-        setFoundCities(citiesByCountry)
+        findCities()
 
     }
 
@@ -150,14 +167,16 @@ export default function Task3() {
                     <p>Show the temperature in these cities.</p>
                 </div>
                 <form>
-                    <p>Check the weather of {valueInput}</p>
+                    <p>Check the weather in  {valueInput} cities</p>
                     <div className='form-group'>
                         <label htmlFor="country"> Enter Country: </label>
                         <input type="text" id="country" value={valueInput} onChange={handleChangeInput} />
                     </div>
-                    <button onClick={handleSubmitForm}>Submit</button>
+                    <button onClick={handleSortbyPopulation}>Sort by population</button>
+                    <button onClick={handleSortByTemperature}>Sort by Temp</button>
 
-                    <CitiesList cityWeatherInfo={cityWeatherInfo} />
+                    {isSortbyTemp ? <CitiesListByTemp cityWeatherInfo={cityWeatherInfo} /> : <CitiesList cityWeatherInfo={cityWeatherInfo} />}
+
                     {error && <p>{error}</p>}
 
                 </form>
@@ -169,9 +188,32 @@ export default function Task3() {
         </div>
     )
 }
+
+
 function CitiesList({ cityWeatherInfo }) {
     return <ul>
         {cityWeatherInfo.map((item, index) => {
+            const temp = Math.round(item?.temp)
+            const status = item?.status;
+            return status ? <li key={`city-${index}`}>{item?.city} Failed: {status}</li> : <li key={`city-${index}`}>{item?.city} temperature {temp} °C</li>;
+
+        })}
+    </ul>;
+}
+
+function CitiesListByTemp({ cityWeatherInfo }) {
+
+    let sortCitiesWithWeatherTemp = [...cityWeatherInfo]
+
+    sortCitiesWithWeatherTemp = cityWeatherInfo.sort(function (elemA, elemB) {
+        //console.log("elem a i b", elemA, elemB)
+        const cityElementTempA = elemA.temp
+        const cityElementTempB = elemB.temp
+        console.log("city elem :", cityElementTempA, cityElementTempB)
+        return cityElementTempB - cityElementTempA
+    })
+    return <ul>
+        {sortCitiesWithWeatherTemp.map((item, index) => {
             const temp = Math.round(item?.temp)
             const status = item?.status;
             return status ? <li key={`city-${index}`}>{item?.city} Failed: {status}</li> : <li key={`city-${index}`}>{item?.city} temperature {temp} °C</li>;
