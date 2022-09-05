@@ -19,14 +19,12 @@ export default function Home() {
 
 
 
-
-
-
-
-
     const handleChangeInput = (e) => {
+
         setValueInput(e.target.value)
     }
+
+
 
     // First API to get Country
     const getCapital = () => {
@@ -38,7 +36,23 @@ export default function Home() {
                 return res.json()
             })
             .then((data) => {
-                return setDataCountriesApi(data)
+                setDataCountriesApi(data)
+                return data
+            })
+            .then((dataCountries) => {
+                const dataApi = dataCountries?.data
+                //Find the value of the first element
+                const foundCountry = dataApi?.find((item) => {
+                    const countryFromApi = item.name
+                    //console.log(countryFromApi)
+                    if (valueInput.toLowerCase() === countryFromApi.toLowerCase()) {
+                        return true;
+                    }
+                    return false;
+                })
+
+                //console.log('find capital', foundCountry?.capital)
+                setCapital(foundCountry?.capital);
             })
             .catch((err) => {
                 console.log(err.message)
@@ -74,9 +88,11 @@ export default function Home() {
     }
 
     useEffect(() => {
-        getCapital()
+        if (valueInput) {
+            getCapital()
+        }
 
-    }, [])
+    }, [valueInput])
 
     //console.log("Data from first API", { dataDetailsList: dataCountriesApi.data })
     useEffect(() => {
@@ -89,6 +105,8 @@ export default function Home() {
     const handleSubmitForm = (e) => {
         e.preventDefault()
 
+
+
         if (!valueInput) {
             setError(true)
             return;
@@ -96,33 +114,14 @@ export default function Home() {
             setError(false)
         }
 
-        const dataApi = dataCountriesApi?.data
-        //Find the value of the first element
-        const foundCountry = dataApi?.find((item) => {
-            const countryFromApi = item.name
-            //console.log(countryFromApi)
-            if (valueInput.toLowerCase() === countryFromApi.toLowerCase()) {
-                return true;
-            }
-            return false;
-        })
-
-        //console.log('find capital', foundCountry?.capital)
-        setCapital(foundCountry?.capital);
-
-
-
         // Build a new array with info : Country, Capital , Weather 
 
         const newElementDetail = {
-            country: foundCountry?.name,
+            country: valueInput,
             capital: capital,
             weather: weatherInfo,
             id: uuidv4(),
         }
-
-        console.log('newElement', newElementDetail)
-
 
         setDetailsDataList((prevState) => {
             return [
@@ -131,6 +130,9 @@ export default function Home() {
 
             ]
         })
+
+        setValueInput('')
+
     }
 
 
@@ -163,12 +165,12 @@ export default function Home() {
                                     {detailsDataList.map((element, index) => {
                                         return (
                                             <>
-                                                {element && <tr key={`elem-${index}`}>
+                                                <tr key={`elem-${index}`}>
                                                     <td>{element.country}</td>
                                                     <td>{element.capital}</td>
                                                     <td>{element.weather}</td>
                                                     <button>Delete</button>
-                                                </tr>}
+                                                </tr>
                                             </>
 
                                         )
