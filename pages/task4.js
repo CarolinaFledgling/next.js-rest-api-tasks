@@ -139,6 +139,17 @@ export default function Home() {
     console.log('detailsDataList', detailsDataList)
 
 
+    const handleDeleteElement = (e, id) => {
+        e.preventDefault()
+        console.log('id', id)
+
+        const filteredElement = detailsDataList.filter((elem) => {
+            return elem.id !== id
+        })
+
+        setDetailsDataList(filteredElement)
+    }
+
     return (
         <div className={styles.container}>
             <Head>
@@ -169,7 +180,7 @@ export default function Home() {
                                                     <td>{element.country}</td>
                                                     <td>{element.capital}</td>
                                                     <td>{element.weather}</td>
-                                                    <button>Delete</button>
+                                                    <button onClick={(e) => handleDeleteElement(e, element.id)}>Delete</button>
                                                 </tr>
                                             </>
 
