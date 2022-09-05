@@ -1,9 +1,14 @@
 # Next.js projects with multiple API CALL
 
-The main goal of that project is to practice working with REST API.
-By using two separate APIs together to complete tasks from description.
+The main goal of that project is to practice working with REST API by solving various tasks, where we retrieve data from two different APIs. 
+Very important, each Task is treated as a separate new project and I do not focus on styles.
+I focus mainly on RESTful-based data fetching. 
+
+Check the link to the [Demo](https://curious-brioche-ee3e50.netlify.app/)
 
 Additionally, I created navigation between tasks to make the project clearer and more readable.
+
+
 
 ## DEMO Link
 
@@ -15,7 +20,7 @@ Additionally, I created navigation between tasks to make the project clearer and
 - Conditional Loading Message 🚀
 - Handling Fetch Errors 🚀
 - Added navigation between tasks  🚀
-- Not focusing on styles 🚀
+- Working with various array methods 🚀
 
 ## Run Locally
 

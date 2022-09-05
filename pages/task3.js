@@ -12,11 +12,6 @@ export default function Task3() {
 
 
 
-
-
-    //[todo] dodac indefikator jak mamy NAN to ze sie doladowuje
-
-
     // Modeling Cities
     const filterCities = () => {
 
@@ -142,6 +137,7 @@ export default function Task3() {
 
     const handleSortbyPopulation = (e) => {
         e.preventDefault()
+        
         setCityWeatherInfo([])
 
         filterCities()
@@ -236,9 +232,14 @@ function CitiesListByTemp({ cityWeatherInfo }) {
     return <ul>
         {sortCitiesWithWeatherTemp.map((item, index) => {
             const temp = Math.round(item?.temp)
+            console.log('temp', {temp})
             const status = item?.status;
             const message = item?.message;
-            return status && message ? <li key={`city-${index}`}>{item?.city} Failed: {status} {message}</li> : <li key={`city-${index}`}>{item?.city} temperature {temp} °C</li>;
+            return (
+                <>{status && message ?
+                    <li key={`city-${index}`}>{item?.city} Failed: {status} {message}</li> :
+                    <li key={`city-${index}`}>{item?.city} {temp === NaN ? <span>Loading</span> : <span>temperature {temp} °C</span>} </li>}</>
+            )
 
         })}
     </ul>;
