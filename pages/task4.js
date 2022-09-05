@@ -94,7 +94,7 @@ export default function Home() {
 
     }, [valueInput])
 
-    //console.log("Data from first API", { dataDetailsList: dataCountriesApi.data })
+
     useEffect(() => {
         if (capital) {
             getWeather(capital)
@@ -114,7 +114,7 @@ export default function Home() {
             setError(false)
         }
 
-        // Build a new array with info : Country, Capital , Weather 
+        // Building a new array with info : Country, Capital , Weather 
 
         const newElementDetail = {
             country: valueInput,
@@ -160,11 +160,23 @@ export default function Home() {
 
             <main className={styles.main}>
                 <div className={styles.description}>
-
+                    <p >
+                        Task nr 4
+                    </p>
+                    <p> Create input where you can enter a country</p>
+                    <p> After entering the name of the country you should get information in one row :</p>
+                    <ul>
+                        <li>Entered country</li>
+                        <li>Capital of the country</li>
+                        <li>Weather information</li>
+                        <li>Button to delete</li>
+                    </ul>
+                    <p>e.g, Enter: Poland  result: Poland Warsaw Clouds Button Delete</p>
+                    <p>Create a list with information and the option to delete an individual row in the list. </p>
                 </div>
                 <div>
                     <form>
-                        <p>Check the weather of  {valueInput}</p>
+
                         <div className='form-group'>
                             <label htmlFor="country"> Enter Country: </label>
                             <input type="text" id="country" value={valueInput} onChange={handleChangeInput} />
@@ -177,6 +189,7 @@ export default function Home() {
                                         return (
                                             <>
                                                 <tr key={`elem-${index}`}>
+                                                    <td>{index + 1}.</td>
                                                     <td>{element.country}</td>
                                                     <td>{element.capital}</td>
                                                     <td>{element.weather}</td>
