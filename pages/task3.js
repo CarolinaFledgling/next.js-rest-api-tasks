@@ -14,11 +14,11 @@ export default function Task3() {
 
 
 
+    //[todo] dodac indefikator jak mamy NAN to ze sie doladowuje
 
 
-
-
-    const findCities = () => {
+    // Modeling Cities
+    const filterCities = () => {
 
         // important filter  return true when is true that item is going to array
         // The filter () function returns a new array that contains the filtered elements
@@ -65,26 +65,19 @@ export default function Task3() {
             console.log('city api', city, index)
             fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${process.env.NEXT_PUBLIC_WEATHERAPI}`)
                 .then((res) => {
-
                     if (!res.ok) {
-                        setCityWeatherInfo((prevArr) => {
-                            prevArr[index] = {
-                                city,
-                                status: 'Not found'
-                            }
-                            return [...prevArr];
-
-                        })
-                        throw Error('problem with fetch in the Weather API')
+                        console.log(res.status);
+                        throw { status: res.status, message: 'City not found in the  Weather API' }
                     }
                     return res.json()
                 })
                 .then((weatherData) => {
                     console.log('seCityWeatherInfo', { weatherData })
+
                     setCityWeatherInfo((prevArr) => {
                         prevArr[index] = {
                             city,
-                            temp: weatherData.main.temp,
+                            temp: weatherData?.main?.temp,
                         }
                         return [...prevArr];
 
@@ -92,9 +85,18 @@ export default function Task3() {
                     setError(null)
 
                 })
-                .catch((err) => {
-                    console.log(err.message)
-                    setError(err.message)
+                .catch((errorObject) => {
+                    console.log('err from catch', { errorObject })
+                    setCityWeatherInfo((prevArr) => {
+                        prevArr[index] = {
+                            city,
+                            status: errorObject.status,
+                            message: errorObject.message
+                        }
+                        return [...prevArr];
+
+                    })
+                    setError('Request failed')
                 })
         })
 
@@ -142,7 +144,7 @@ export default function Task3() {
         e.preventDefault()
         setCityWeatherInfo([])
 
-        findCities()
+        filterCities()
 
         setIsSortByTemp(false)
 
@@ -155,7 +157,7 @@ export default function Task3() {
 
         setCityWeatherInfo([])
 
-        findCities()
+        filterCities()
 
     }
 
@@ -163,11 +165,9 @@ export default function Task3() {
         <div className={styles.container}>
             <main className={styles.main}>
                 <div className={styles.description}>
-                    <p>Enter the country and list the biggest cities. </p>
-                    <p>Show the temperature in these cities.</p>
+                    <p>Sort cities in: {valueInput} by population or temperature</p>
                 </div>
                 <form>
-                    <p>Check the weather in  {valueInput} cities</p>
                     <div className='form-group'>
                         <label htmlFor="country"> Enter Country: </label>
                         <input type="text" id="country" value={valueInput} onChange={handleChangeInput} />
@@ -189,7 +189,6 @@ export default function Task3() {
     )
 }
 
-
 function CitiesList({ cityWeatherInfo }) {
     return <ul>
         {cityWeatherInfo.map((item, index) => {
@@ -205,18 +204,41 @@ function CitiesListByTemp({ cityWeatherInfo }) {
 
     let sortCitiesWithWeatherTemp = [...cityWeatherInfo]
 
-    sortCitiesWithWeatherTemp = cityWeatherInfo.sort(function (elemA, elemB) {
+    sortCitiesWithWeatherTemp.sort(function (elemA, elemB) {
         //console.log("elem a i b", elemA, elemB)
-        const cityElementTempA = elemA.temp
-        const cityElementTempB = elemB.temp
-        console.log("city elem :", cityElementTempA, cityElementTempB)
-        return cityElementTempB - cityElementTempA
+        const cityElementTempA = elemA.temp;
+        const cityElementTempB = elemB.temp;
+
+        // from the lowest temperature to the highest
+
+        if (cityElementTempA === undefined) {
+            return 1;
+        }
+
+        if (cityElementTempB === undefined) {
+            return -1
+        }
+
+        if (cityElementTempA < cityElementTempB) {
+            return -1;
+        }
+
+        if (cityElementTempA > cityElementTempB) {
+            return 1;
+        }
+
+        return 0;
+
+        //console.log("city elem :", cityElementTempA, cityElementTempB)
     })
+
+    console.log('sortCitiesWithWeatherTemp', sortCitiesWithWeatherTemp)
     return <ul>
         {sortCitiesWithWeatherTemp.map((item, index) => {
             const temp = Math.round(item?.temp)
             const status = item?.status;
-            return status ? <li key={`city-${index}`}>{item?.city} Failed: {status}</li> : <li key={`city-${index}`}>{item?.city} temperature {temp} °C</li>;
+            const message = item?.message;
+            return status && message ? <li key={`city-${index}`}>{item?.city} Failed: {status} {message}</li> : <li key={`city-${index}`}>{item?.city} temperature {temp} °C</li>;
 
         })}
     </ul>;
