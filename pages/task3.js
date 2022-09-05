@@ -137,7 +137,7 @@ export default function Task3() {
 
     const handleSortbyPopulation = (e) => {
         e.preventDefault()
-        
+
         setCityWeatherInfo([])
 
         filterCities()
@@ -232,7 +232,7 @@ function CitiesListByTemp({ cityWeatherInfo }) {
     return <ul>
         {sortCitiesWithWeatherTemp.map((item, index) => {
             const temp = Math.round(item?.temp)
-            console.log('temp', {temp})
+            console.log('temp', { temp })
             const status = item?.status;
             const message = item?.message;
             return (
