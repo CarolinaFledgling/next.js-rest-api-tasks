@@ -17,11 +17,22 @@ export default function Home() {
     // Array of country , capital , weather Info 
     const [detailsDataList, setDetailsDataList] = useState([])
 
+    // Edit functionality 
+
+    const [inputSaveValue, setInputSaveValue] = useState("")
+    const [isEdit, setIsEdit] = useState(false)
+    const [savedIdEditElement, setSavedIDEditElement] = useState(false)
+
 
 
     const handleChangeInput = (e) => {
 
         setValueInput(e.target.value)
+    }
+
+    const handleChangeSaveInput = (e) => {
+
+        setInputSaveValue(e.target.value)
     }
 
 
@@ -88,11 +99,11 @@ export default function Home() {
     }
 
     useEffect(() => {
-        if (valueInput) {
+        if (valueInput || inputSaveValue) {
             getCapital()
         }
 
-    }, [valueInput])
+    }, [valueInput, inputSaveValue])
 
 
     useEffect(() => {
@@ -138,16 +149,52 @@ export default function Home() {
 
     console.log('detailsDataList', detailsDataList)
 
-
+    // DELETING ELEMENT 
     const handleDeleteElement = (e, id) => {
         e.preventDefault()
-        console.log('id', id)
 
         const filteredElement = detailsDataList.filter((elem) => {
+            console.log("elem", elem.id)
+            console.log("id", id)
             return elem.id !== id
         })
 
+        console.log("filteredElement", filteredElement)
+
         setDetailsDataList(filteredElement)
+    }
+
+    // EDITING ELEMENT 
+
+    const handleEditClick = (e, element, id) => {
+        e.preventDefault()
+        console.log('Edit id', id)
+        console.log('Edit element', element)
+
+
+        setIsEdit(true)
+        setSavedIDEditElement(id)
+
+
+    }
+
+
+    const handlerChangeSaveEditing = (e) => {
+        e.preventDefault()
+
+        let findElement = detailsDataList.find((elem) => {
+            return elem.id === savedIdEditElement
+        })
+
+        console.log('findElement w Edit', findElement)
+
+        findElement.country = inputSaveValue
+
+        console.log('findElement w Edit', findElement)
+        // [todo] fix, after editing a new value we need to invoke functionality for featching 
+        setDetailsDataList([...detailsDataList])
+        setIsEdit(false)
+
     }
 
     return (
@@ -188,13 +235,10 @@ export default function Home() {
                                     {detailsDataList.map((element, index) => {
                                         return (
                                             <>
-                                                <tr key={`elem-${index}`}>
-                                                    <td>{index + 1}.</td>
-                                                    <td>{element.country}</td>
-                                                    <td>{element.capital}</td>
-                                                    <td>{element.weather}</td>
-                                                    <button onClick={(e) => handleDeleteElement(e, element.id)}>Delete</button>
-                                                </tr>
+                                                {isEdit ?
+                                                    <EditingTemplate inputSaveValue={inputSaveValue} handleChangeSaveInput={handleChangeSaveInput} handlerChangeSaveEditing={handlerChangeSaveEditing} />
+                                                    :
+                                                    <SingleTemplate index={index} element={element} handleDeleteElement={handleDeleteElement} handleEditClick={handleEditClick} />}
                                             </>
 
                                         )
@@ -211,3 +255,24 @@ export default function Home() {
         </div>
     )
 }
+function SingleTemplate({ index, element, handleDeleteElement, handleEditClick }) {
+    return <tr key={`elem-${index}`}>
+        <td>{index + 1}.</td>
+        <td>{element.country}</td>
+        <td>{element.capital}</td>
+        <td>{element.weather}</td>
+        <button onClick={(e) => handleDeleteElement(e, element.id)}>Delete</button>
+        <button onClick={(e) => handleEditClick(e, element, element.id)}>Edit</button>
+    </tr>;
+}
+
+function EditingTemplate({ inputSaveValue, handleChangeSaveInput, handlerChangeSaveEditing }) {
+    return <div>
+        <label htmlFor="input-name">
+            Edit entered value: &nbsp;
+        </label>
+        <input value={inputSaveValue} onChange={handleChangeSaveInput} id="input-name" type="text" />
+        <button onClick={handlerChangeSaveEditing}>Save</button>
+    </div>;
+}
+
