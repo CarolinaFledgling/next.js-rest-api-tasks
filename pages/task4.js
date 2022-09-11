@@ -93,18 +93,17 @@ export default function Home() {
         setIsLoading(true)
 
 
-        const findedCapital = findCapital(valueInput)
-
+        const foundCapitalElement = findCapital(valueInput)
 
 
         // Second API to get Weather info
-        if (findedCapital) {
-            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${findedCapital}&appid=${process.env.NEXT_PUBLIC_WEATHERAPI}`)
+        if (foundCapitalElement) {
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${foundCapitalElement}&appid=${process.env.NEXT_PUBLIC_WEATHERAPI}`)
                 .then((res) => {
                     if (!res.ok) {
                         throw Error('Could not fetch data')
                     }
-                    return res.json()
+                    return res.json();
                 })
                 .then((data) => {
                     console.log('weatherDataApi details: ', { data, dataName: data.name, dataWeather: data.weather });
@@ -113,12 +112,9 @@ export default function Home() {
                     })
                     console.log('weatherDetails: ', weatherDetails);
 
-                    //console.log(weatherDetails);
-                    setFetchError(false)
-
                     const newElementDetail = {
                         country: valueInput,
-                        capital: findedCapital,
+                        capital: foundCapitalElement,
                         weather: weatherDetails,
                         id: uuidv4(),
                     }
@@ -132,15 +128,15 @@ export default function Home() {
                     })
 
                 })
-
                 .catch((err) => {
                     console.log("error", err)
                     setFetchError(true)
                 })
+                .finally(() => {
+                    setIsLoading(false)
+                })
+
         }
-
-
-        setIsLoading(false)
 
         setValueInput('')
 
