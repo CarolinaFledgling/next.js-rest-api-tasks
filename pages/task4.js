@@ -12,7 +12,7 @@ export default function Home() {
 
 
     const [capital, setCapital] = useState("")
-    const [weatherInfo, setWeatherInfo] = useState([])
+    const [weatherInfo, setWeatherInfo] = useState('')
     const [isLoading, setIsLoading] = useState(false)
 
     // Array of country , capital , weather Info 
@@ -57,46 +57,28 @@ export default function Home() {
     }
 
 
-    // Second API to get Weather info
-    const getWeather = (providedCapital) => {
-        //console.log('getWeather', { providedCapital });
-        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${providedCapital}&appid=${process.env.NEXT_PUBLIC_WEATHERAPI}`)
-            .then((res) => {
-                if (!res.ok) {
-                    throw Error('Could not fetch data')
-                }
-                return res.json()
-            })
-            .then((data) => {
-                console.log('weatherDataApi details: ', { data, dataName: data.name, dataWeather: data.weather });
-                const weatherDetails = data.weather.map((detail) => {
-                    return detail.main;
-                })
-                console.log('weatherDetails: ', weatherDetails);
-                setWeatherInfo(weatherDetails);
-                //console.log(weatherDetails);
-                setFetchError(false)
-
-            })
-            .catch((err) => {
-                console.log("error", err)
-                setFetchError(true)
-            })
-    }
-
-
-
     // na mauncie pobieram wszystkie stolice 
     useEffect(() => {
         getCapital()
     }, [])
 
-    useEffect(() => {
-        if (capital) {
-            getWeather(capital)
-        }
-    }, [capital]);
 
+    const findCapital = (providedCountry) => {
+        const dataApi = dataCountriesApi?.data
+        //Find the value of the first element
+        const foundCountry = dataApi?.find((item) => {
+            const countryFromApi = item.name
+            //console.log(countryFromApi)
+            if (providedCountry.toLowerCase() === countryFromApi.toLowerCase()) {
+                return true;
+            }
+            return false;
+        })
+
+        console.log('find capital', foundCountry?.capital)
+
+        return foundCountry?.capital
+    }
 
     const handleSubmitForm = (e) => {
         e.preventDefault()
@@ -110,37 +92,55 @@ export default function Home() {
 
         setIsLoading(true)
 
-        const dataApi = dataCountriesApi?.data
-        //Find the value of the first element
-        const foundCountry = dataApi?.find((item) => {
-            const countryFromApi = item.name
-            //console.log(countryFromApi)
-            if (valueInput.toLowerCase() === countryFromApi.toLowerCase()) {
-                return true;
-            }
-            return false;
-        })
 
-        //console.log('find capital', foundCountry?.capital)
-        setCapital(foundCountry?.capital);
+        const findedCapital = findCapital(valueInput)
 
 
-        // Building a new array with info : Country, Capital , Weather 
 
-        const newElementDetail = {
-            country: valueInput,
-            capital: capital,
-            weather: weatherInfo,
-            id: uuidv4(),
+        // Second API to get Weather info
+        if (findedCapital) {
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${findedCapital}&appid=${process.env.NEXT_PUBLIC_WEATHERAPI}`)
+                .then((res) => {
+                    if (!res.ok) {
+                        throw Error('Could not fetch data')
+                    }
+                    return res.json()
+                })
+                .then((data) => {
+                    console.log('weatherDataApi details: ', { data, dataName: data.name, dataWeather: data.weather });
+                    const weatherDetails = data.weather.map((detail) => {
+                        return detail.main;
+                    })
+                    console.log('weatherDetails: ', weatherDetails);
+
+                    //console.log(weatherDetails);
+                    setFetchError(false)
+
+                    const newElementDetail = {
+                        country: valueInput,
+                        capital: findedCapital,
+                        weather: weatherDetails,
+                        id: uuidv4(),
+                    }
+
+                    setDetailsDataList((prevState) => {
+                        return [
+                            ...prevState,
+                            newElementDetail,
+
+                        ]
+                    })
+
+                })
+
+                .catch((err) => {
+                    console.log("error", err)
+                    setFetchError(true)
+                })
         }
 
-        setDetailsDataList((prevState) => {
-            return [
-                ...prevState,
-                newElementDetail,
 
-            ]
-        })
+        setIsLoading(false)
 
         setValueInput('')
 
