@@ -13,6 +13,7 @@ export default function Home() {
 
     const [capital, setCapital] = useState("")
     const [weatherInfo, setWeatherInfo] = useState([])
+    const [isLoading, setIsLoading] = useState(false)
 
     // Array of country , capital , weather Info 
     const [detailsDataList, setDetailsDataList] = useState([])
@@ -36,8 +37,6 @@ export default function Home() {
     }
 
 
-
-    // First API to get Country
     const getCapital = () => {
         fetch('https://countriesnow.space/api/v0.1/countries/capital')
             .then((res) => {
@@ -48,28 +47,15 @@ export default function Home() {
             })
             .then((data) => {
                 setDataCountriesApi(data)
-                return data
-            })
-            .then((dataCountries) => {
-                const dataApi = dataCountries?.data
-                //Find the value of the first element
-                const foundCountry = dataApi?.find((item) => {
-                    const countryFromApi = item.name
-                    //console.log(countryFromApi)
-                    if (valueInput.toLowerCase() === countryFromApi.toLowerCase()) {
-                        return true;
-                    }
-                    return false;
-                })
 
-                //console.log('find capital', foundCountry?.capital)
-                setCapital(foundCountry?.capital);
+
             })
             .catch((err) => {
                 console.log(err.message)
                 setFetchError(true)
             })
     }
+
 
     // Second API to get Weather info
     const getWeather = (providedCapital) => {
@@ -98,13 +84,12 @@ export default function Home() {
             })
     }
 
+
+
+    // na mauncie pobieram wszystkie stolice 
     useEffect(() => {
-        if (valueInput || inputSaveValue) {
-            getCapital()
-        }
-
-    }, [valueInput, inputSaveValue])
-
+        getCapital()
+    }, [])
 
     useEffect(() => {
         if (capital) {
@@ -116,14 +101,29 @@ export default function Home() {
     const handleSubmitForm = (e) => {
         e.preventDefault()
 
-
-
         if (!valueInput) {
             setError(true)
             return;
         } else {
             setError(false)
         }
+
+        setIsLoading(true)
+
+        const dataApi = dataCountriesApi?.data
+        //Find the value of the first element
+        const foundCountry = dataApi?.find((item) => {
+            const countryFromApi = item.name
+            //console.log(countryFromApi)
+            if (valueInput.toLowerCase() === countryFromApi.toLowerCase()) {
+                return true;
+            }
+            return false;
+        })
+
+        //console.log('find capital', foundCountry?.capital)
+        setCapital(foundCountry?.capital);
+
 
         // Building a new array with info : Country, Capital , Weather 
 
@@ -228,7 +228,7 @@ export default function Home() {
                             <label htmlFor="country"> Enter Country: </label>
                             <input type="text" id="country" value={valueInput} onChange={handleChangeInput} />
                         </div>
-                        <button onClick={handleSubmitForm}>Add to the List</button>
+                        <button disabled={isLoading} onClick={handleSubmitForm}>{isLoading ? 'Loading...' : 'Add to the List'}</button>
                         <div>
                             <table>
                                 <tbody>
@@ -236,7 +236,7 @@ export default function Home() {
                                         return (
                                             <>
                                                 {isEdit ?
-                                                    <EditingTemplate inputSaveValue={inputSaveValue} handleChangeSaveInput={handleChangeSaveInput} handlerChangeSaveEditing={handlerChangeSaveEditing} />
+                                                    <EditingTemplate index={index} inputSaveValue={inputSaveValue} handleChangeSaveInput={handleChangeSaveInput} handlerChangeSaveEditing={handlerChangeSaveEditing} />
                                                     :
                                                     <SingleTemplate index={index} element={element} handleDeleteElement={handleDeleteElement} handleEditClick={handleEditClick} />}
                                             </>
@@ -266,8 +266,8 @@ function SingleTemplate({ index, element, handleDeleteElement, handleEditClick }
     </tr>;
 }
 
-function EditingTemplate({ inputSaveValue, handleChangeSaveInput, handlerChangeSaveEditing }) {
-    return <div>
+function EditingTemplate({ inputSaveValue, handleChangeSaveInput, handlerChangeSaveEditing, index }) {
+    return <div key={`elem-${index}`}>
         <label htmlFor="input-name">
             Edit entered value: &nbsp;
         </label>
