@@ -182,9 +182,9 @@ export default function Home() {
         const foundCapitalElement = findCapital(inputSaveValue);
 
         // Second API to get Weather info
-        if (findElement.country) {
+        if (foundCapitalElement) {
             fetch(
-                `https://api.openweathermap.org/data/2.5/weather?q=${findElement.country}&appid=${process.env.NEXT_PUBLIC_WEATHERAPI}`
+                `https://api.openweathermap.org/data/2.5/weather?q=${foundCapitalElement}&appid=${process.env.NEXT_PUBLIC_WEATHERAPI}`
             )
                 .then((res) => {
                     if (!res.ok) {
