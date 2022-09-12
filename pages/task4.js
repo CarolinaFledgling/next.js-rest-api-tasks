@@ -169,6 +169,8 @@ export default function Home() {
 
 
         setIsEdit(true)
+        // default Value when we editing
+        setInputSaveValue(element.country)
         setSavedIDEditElement(id)
 
 
@@ -237,7 +239,7 @@ export default function Home() {
                                         return (
                                             <>
                                                 {savedIdEditElement === element.id ?
-                                                    <EditingTemplate index={index} inputSaveValue={inputSaveValue} handleSave={handleSave} handlerChangeSaveEditing={handlerChangeSaveEditing} />
+                                                    <EditingTemplate element={element} index={index} inputSaveValue={inputSaveValue} handleSave={handleSave} handlerChangeSaveEditing={handlerChangeSaveEditing} />
                                                     :
                                                     <SingleTemplate index={index} element={element} handleDeleteElement={handleDeleteElement} handleEditClick={handleEditClick} />}
                                             </>
@@ -267,13 +269,18 @@ function SingleTemplate({ index, element, handleDeleteElement, handleEditClick }
     </tr>;
 }
 
-function EditingTemplate({ inputSaveValue, handleSave, handlerChangeSaveEditing, index }) {
-    return <div key={`elem-${index}`}>
-        <label htmlFor="input-name">
-            Edit entered value: &nbsp;
-        </label>
-        <input value={inputSaveValue} onChange={handleSave} id="input-name" type="text" />
-        <button onClick={handlerChangeSaveEditing}>Save</button>
-    </div>;
+function EditingTemplate({ inputSaveValue, handleSave, handlerChangeSaveEditing, index, element }) {
+    return (
+        <div className='edit-row' key={`elem-${index}`}>
+            <p> {index + 1}. </p>
+            <label htmlFor="input-name">
+                &nbsp;Edited value: &nbsp;
+            </label>
+            <input value={inputSaveValue} defaultValue={element.country} onChange={handleSave} id="input-name" type="text" />
+            <button onClick={handlerChangeSaveEditing}>Save</button>
+
+        </div>
+    )
+
 }
 
