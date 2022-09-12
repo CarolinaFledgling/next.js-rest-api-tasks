@@ -31,7 +31,7 @@ export default function Home() {
         setValueInput(e.target.value)
     }
 
-    const handleChangeSaveInput = (e) => {
+    const handleSave = (e) => {
 
         setInputSaveValue(e.target.value)
     }
@@ -187,9 +187,14 @@ export default function Home() {
         findElement.country = inputSaveValue
 
         console.log('findElement w Edit', findElement)
-        // [todo] fix, after editing a new value we need to invoke functionality for featching 
+
         setDetailsDataList([...detailsDataList])
         setIsEdit(false)
+
+        // to clean
+        setSavedIDEditElement(null)
+
+
 
     }
 
@@ -222,7 +227,7 @@ export default function Home() {
 
                         <div className='form-group'>
                             <label htmlFor="country"> Enter Country: </label>
-                            <input type="text" id="country" value={valueInput} onChange={handleChangeInput} />
+                            <input disabled={isLoading} type="text" id="country" value={valueInput} onChange={handleChangeInput} />
                         </div>
                         <button disabled={isLoading} onClick={handleSubmitForm}>{isLoading ? 'Loading...' : 'Add to the List'}</button>
                         <div>
@@ -231,8 +236,8 @@ export default function Home() {
                                     {detailsDataList.map((element, index) => {
                                         return (
                                             <>
-                                                {isEdit ?
-                                                    <EditingTemplate index={index} inputSaveValue={inputSaveValue} handleChangeSaveInput={handleChangeSaveInput} handlerChangeSaveEditing={handlerChangeSaveEditing} />
+                                                {savedIdEditElement === element.id ?
+                                                    <EditingTemplate index={index} inputSaveValue={inputSaveValue} handleSave={handleSave} handlerChangeSaveEditing={handlerChangeSaveEditing} />
                                                     :
                                                     <SingleTemplate index={index} element={element} handleDeleteElement={handleDeleteElement} handleEditClick={handleEditClick} />}
                                             </>
@@ -262,12 +267,12 @@ function SingleTemplate({ index, element, handleDeleteElement, handleEditClick }
     </tr>;
 }
 
-function EditingTemplate({ inputSaveValue, handleChangeSaveInput, handlerChangeSaveEditing, index }) {
+function EditingTemplate({ inputSaveValue, handleSave, handlerChangeSaveEditing, index }) {
     return <div key={`elem-${index}`}>
         <label htmlFor="input-name">
             Edit entered value: &nbsp;
         </label>
-        <input value={inputSaveValue} onChange={handleChangeSaveInput} id="input-name" type="text" />
+        <input value={inputSaveValue} onChange={handleSave} id="input-name" type="text" />
         <button onClick={handlerChangeSaveEditing}>Save</button>
     </div>;
 }
