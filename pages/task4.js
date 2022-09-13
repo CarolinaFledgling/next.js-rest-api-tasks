@@ -8,9 +8,6 @@ export default function Home() {
     const [dataCountriesApi, setDataCountriesApi] = useState([]);
     const [error, setError] = useState(false);
     const [fetchError, setFetchError] = useState(false);
-
-    const [capital, setCapital] = useState("");
-    const [weatherInfo, setWeatherInfo] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [isSaveLoading, setIsSaveLoading] = useState(false);
 
@@ -29,6 +26,38 @@ export default function Home() {
 
     const handleSave = (e) => {
         setInputSaveValue(e.target.value);
+    };
+
+    const getWeather = (foundCapitalElement, dataCallback) => {
+        fetch(
+            `https://api.openweathermap.org/data/2.5/weather?q=${foundCapitalElement}&appid=${process.env.NEXT_PUBLIC_WEATHERAPI}`
+        )
+            .then((res) => {
+                if (!res.ok) {
+                    throw Error("Could not fetch data");
+                }
+                return res.json();
+            })
+            .then((data) => {
+                console.log("weatherDataApi details: ", {
+                    data,
+                    dataName: data.name,
+                    dataWeather: data.weather,
+                });
+                const weatherDetails = data.weather.map((detail) => {
+                    return detail.main;
+                });
+                console.log("weatherDetails: ", weatherDetails);
+
+                dataCallback(weatherDetails);
+            })
+            .catch((err) => {
+                console.log("error", err);
+                setFetchError(true);
+            })
+            .finally(() => {
+                setIsSaveLoading(false);
+            });
     };
 
     const getCapital = () => {
@@ -86,44 +115,20 @@ export default function Home() {
 
         // Second API to get Weather info
         if (foundCapitalElement) {
-            fetch(
-                `https://api.openweathermap.org/data/2.5/weather?q=${foundCapitalElement}&appid=${process.env.NEXT_PUBLIC_WEATHERAPI}`
-            )
-                .then((res) => {
-                    if (!res.ok) {
-                        throw Error("Could not fetch data");
-                    }
-                    return res.json();
-                })
-                .then((data) => {
-                    console.log("weatherDataApi details: ", {
-                        data,
-                        dataName: data.name,
-                        dataWeather: data.weather,
-                    });
-                    const weatherDetails = data.weather.map((detail) => {
-                        return detail.main;
-                    });
-                    console.log("weatherDetails: ", weatherDetails);
+            
+            getWeather(foundCapitalElement, (weatherDetails) => {
 
-                    const newElementDetail = {
-                        country: valueInput,
-                        capital: foundCapitalElement,
-                        weather: weatherDetails,
-                        id: uuidv4(),
-                    };
+                const newElementDetail = {
+                    country: valueInput,
+                    capital: foundCapitalElement,
+                    weather: weatherDetails,
+                    id: uuidv4(),
+                };
 
-                    setDetailsDataList((prevState) => {
-                        return [...prevState, newElementDetail];
-                    });
-                })
-                .catch((err) => {
-                    console.log("error", err);
-                    setFetchError(true);
-                })
-                .finally(() => {
-                    setIsLoading(false);
+                setDetailsDataList((prevState) => {
+                    return [...prevState, newElementDetail];
                 });
+            })
         }
 
         setValueInput("");
@@ -183,39 +188,14 @@ export default function Home() {
 
         // Second API to get Weather info
         if (foundCapitalElement) {
-            fetch(
-                `https://api.openweathermap.org/data/2.5/weather?q=${foundCapitalElement}&appid=${process.env.NEXT_PUBLIC_WEATHERAPI}`
-            )
-                .then((res) => {
-                    if (!res.ok) {
-                        throw Error("Could not fetch data");
-                    }
-                    return res.json();
-                })
-                .then((data) => {
-                    console.log("weatherDataApi details: ", {
-                        data,
-                        dataName: data.name,
-                        dataWeather: data.weather,
-                    });
-                    const weatherDetails = data.weather.map((detail) => {
-                        return detail.main;
-                    });
-                    console.log("weatherDetails: ", weatherDetails);
 
-                    findElement.weather = weatherDetails;
-                    findElement.capital = foundCapitalElement;
+            getWeather(foundCapitalElement, (weatherDetails) => {
+                findElement.weather = weatherDetails;
+                findElement.capital = foundCapitalElement;
 
-                    setSavedIDEditElement(null);
-                    setDetailsDataList([...detailsDataList]);
-                })
-                .catch((err) => {
-                    console.log("error", err);
-                    setFetchError(true);
-                })
-                .finally(() => {
-                    setIsSaveLoading(false);
-                });
+                setSavedIDEditElement(null);
+                setDetailsDataList([...detailsDataList]);
+            });
         }
     };
 
