@@ -8,9 +8,9 @@ export default function Home() {
     const [dataCountriesApi, setDataCountriesApi] = useState([]);
     const [error, setError] = useState(false);
     const [fetchError, setFetchError] = useState(false);
+    const [errorNotFoundCapita, setErrorNotFoundCapital] = useState(false);
 
-    const [capital, setCapital] = useState("");
-    const [weatherInfo, setWeatherInfo] = useState("");
+
     const [isLoading, setIsLoading] = useState(false);
     const [isSaveLoading, setIsSaveLoading] = useState(false);
 
@@ -48,12 +48,13 @@ export default function Home() {
             });
     };
 
-    // na mauncie pobieram wszystkie stolice
+
     useEffect(() => {
         getCapital();
     }, []);
 
     const findCapital = (providedCountry) => {
+
         const dataApi = dataCountriesApi?.data;
         //Find the value of the first element
         const foundCountry = dataApi?.find((item) => {
@@ -83,6 +84,13 @@ export default function Home() {
         setIsLoading(true);
 
         const foundCapitalElement = findCapital(valueInput);
+
+        if (foundCapitalElement === undefined) {
+            setErrorNotFoundCapital(true)
+            setValueInput("");
+            setIsLoading(false);
+            return;
+        }
 
         // Second API to get Weather info
         if (foundCapitalElement) {
@@ -123,6 +131,7 @@ export default function Home() {
                 })
                 .finally(() => {
                     setIsLoading(false);
+                    setErrorNotFoundCapital(false)
                 });
         }
 
@@ -295,6 +304,7 @@ export default function Home() {
 
                         {error && <p>Please write the name of country </p>}
                         {fetchError && <p>Something went wrong with API Call </p>}
+                        {errorNotFoundCapita && <p>Sorry Not found Capital, Please write the name of country </p>}
                     </form>
                 </div>
             </main>
