@@ -307,7 +307,7 @@ export default function Home() {
                                 </div>
                                 {error && <p>Please write the name of country </p>}
                                 {fetchError && <p>Something went wrong with API Call </p>}
-                                {errorNotFoundCapita && <p>Sorry Not found Capital, Please write the name of country </p>}
+                                {errorNotFoundCapita && <p>Sorry Not found Country, Please write again </p>}
                             </div>
 
                             <div className="container-search">
@@ -323,7 +323,6 @@ export default function Home() {
                                 {/* displaying search value */}
                                 <div>
                                     {detailsDataList.filter((value) => {
-                                        // we want to return everything 
                                         if (searchValueInput == "") {
                                             return;
                                         } else if (value.country.toLowerCase().includes(searchValueInput.toLowerCase())) {
