@@ -18,11 +18,13 @@ export default function Home() {
     const [detailsDataList, setDetailsDataList] = useState([]);
 
     // Edit functionality
-
     const [inputSaveValue, setInputSaveValue] = useState("");
-
     const [savedIdEditElement, setSavedIDEditElement] = useState(false);
+    // Search 
+    const [searchValueInput, setSearchValueInput] = useState("");
 
+
+    //---------------------------------------------------------------------------//
     const handleChangeInput = (e) => {
         setValueInput(e.target.value);
     };
@@ -259,52 +261,92 @@ export default function Home() {
                 </div>
                 <div>
                     <form>
-                        <div className="form-group">
-                            <label htmlFor="country"> Enter Country: </label>
-                            <input
-                                disabled={isLoading}
-                                type="text"
-                                id="country"
-                                value={valueInput}
-                                onChange={handleChangeInput}
-                            />
-                        </div>
-                        <button disabled={isLoading} onClick={handleSubmitForm}>
-                            {isLoading ? "Loading..." : "Add to the List"}
-                        </button>
-                        <div>
-                            <table>
-                                <tbody>
-                                    {detailsDataList.map((element, index) => {
+                        <div className="container">
+                            <div>
+                                <div className="form-group">
+                                    <label htmlFor="country"> Enter Country: </label>
+                                    <input
+                                        disabled={isLoading}
+                                        type="text"
+                                        id="country"
+                                        value={valueInput}
+                                        onChange={handleChangeInput}
+                                    />
+                                </div>
+                                <button disabled={isLoading} onClick={handleSubmitForm}>
+                                    {isLoading ? "Loading..." : "Add to the List"}
+                                </button>
+                                <div>
+                                    <table>
+                                        <tbody>
+                                            {detailsDataList.map((element, index) => {
+                                                return (
+                                                    <>
+                                                        {savedIdEditElement === element.id ? (
+                                                            <EditingTemplate
+                                                                isSaveLoading={isSaveLoading}
+                                                                element={element}
+                                                                index={index}
+                                                                inputSaveValue={inputSaveValue}
+                                                                handleSave={handleSave}
+                                                                handlerChangeSaveEditing={handlerChangeSaveEditing}
+                                                            />
+                                                        ) : (
+                                                            <SingleTemplate
+                                                                index={index}
+                                                                element={element}
+                                                                handleDeleteElement={handleDeleteElement}
+                                                                handleEditClick={handleEditClick}
+                                                            />
+                                                        )}
+                                                    </>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {error && <p>Please write the name of country </p>}
+                                {fetchError && <p>Something went wrong with API Call </p>}
+                                {errorNotFoundCapita && <p>Sorry Not found Capital, Please write the name of country </p>}
+                            </div>
+
+                            <div className="container-search">
+                                <div className="form-group">
+                                    <label htmlFor="country-search"> Search Country: </label>
+                                    <input
+                                        placeholder="search..."
+                                        type="text"
+                                        id="country-search"
+                                        onChange={event => { setSearchValueInput(event.target.value) }}
+                                    />
+                                </div>
+                                {/* displaying search value */}
+                                <div>
+                                    {detailsDataList.filter((value) => {
+                                        // we want to return everything 
+                                        if (searchValueInput == "") {
+                                            return;
+                                        } else if (value.country.toLowerCase().includes(searchValueInput.toLowerCase())) {
+                                            return value
+                                        }
+                                    }).map((elem, index) => {
                                         return (
-                                            <>
-                                                {savedIdEditElement === element.id ? (
-                                                    <EditingTemplate
-                                                        isSaveLoading={isSaveLoading}
-                                                        element={element}
-                                                        index={index}
-                                                        inputSaveValue={inputSaveValue}
-                                                        handleSave={handleSave}
-                                                        handlerChangeSaveEditing={handlerChangeSaveEditing}
-                                                    />
-                                                ) : (
-                                                    <SingleTemplate
-                                                        index={index}
-                                                        element={element}
-                                                        handleDeleteElement={handleDeleteElement}
-                                                        handleEditClick={handleEditClick}
-                                                    />
-                                                )}
-                                            </>
-                                        );
+                                            <div className="searched-wrapper" key={index}>
+                                                <p>{elem.country}</p>
+                                                <p>{elem.capital}</p>
+                                                <p>{elem.weather}</p>
+                                            </div>)
+
                                     })}
-                                </tbody>
-                            </table>
+
+                                </div>
+                            </div>
                         </div>
 
-                        {error && <p>Please write the name of country </p>}
-                        {fetchError && <p>Something went wrong with API Call </p>}
-                        {errorNotFoundCapita && <p>Sorry Not found Capital, Please write the name of country </p>}
+
+
+
+
                     </form>
                 </div>
             </main>
