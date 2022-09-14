@@ -9,6 +9,7 @@ export default function Home() {
     const [error, setError] = useState(false);
     const [fetchError, setFetchError] = useState(false);
     const [errorNotFoundCapita, setErrorNotFoundCapital] = useState(false);
+    const [errorFoundTheSameCountry, setErrorFoundTheSameCountry] = useState(false);
 
 
     const [isLoading, setIsLoading] = useState(false);
@@ -82,6 +83,19 @@ export default function Home() {
         } else {
             setError(false);
         }
+
+        console.log("detailsDataList", detailsDataList)
+
+        const found = detailsDataList.find((elem) => {
+            return elem.country === valueInput
+        })
+
+        if (found) {
+            setErrorFoundTheSameCountry(true)
+            return;
+        }
+
+        console.log('found ele', found)
 
         setIsLoading(true);
 
@@ -308,6 +322,7 @@ export default function Home() {
                                 {error && <p>Please write the name of country </p>}
                                 {fetchError && <p>Something went wrong with API Call </p>}
                                 {errorNotFoundCapita && <p>Sorry Not found Country, Please write again </p>}
+                                {errorFoundTheSameCountry && <p>there is it on the our list </p>}
                             </div>
 
                             <div className="container-search">
@@ -324,9 +339,9 @@ export default function Home() {
                                 <div>
                                     {detailsDataList.filter((value) => {
                                         if (searchValueInput == "") {
-                                            return;
+                                            return false
                                         } else if (value.country.toLowerCase().includes(searchValueInput.toLowerCase())) {
-                                            return value
+                                            return true
                                         }
                                     }).map((elem, index) => {
                                         return (
