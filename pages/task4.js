@@ -57,6 +57,7 @@ export default function Home() {
             })
             .finally(() => {
                 setIsSaveLoading(false);
+                setIsLoading(false)
             });
     };
 
