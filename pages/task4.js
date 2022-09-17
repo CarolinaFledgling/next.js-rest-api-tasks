@@ -9,8 +9,8 @@ export default function Home() {
     const [error, setError] = useState(false);
     const [fetchError, setFetchError] = useState(false);
     const [errorNotFoundCapita, setErrorNotFoundCapital] = useState(false);
-    const [errorFoundTheSameCountry, setErrorFoundTheSameCountry] = useState(false);
-
+    const [errorFoundTheSameCountry, setErrorFoundTheSameCountry] =
+        useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
     const [isSaveLoading, setIsSaveLoading] = useState(false);
@@ -21,9 +21,8 @@ export default function Home() {
     // Edit functionality
     const [inputSaveValue, setInputSaveValue] = useState("");
     const [savedIdEditElement, setSavedIDEditElement] = useState(false);
-    // Search 
+    // Search
     const [searchValueInput, setSearchValueInput] = useState("");
-
 
     //---------------------------------------------------------------------------//
     const handleChangeInput = (e) => {
@@ -50,14 +49,44 @@ export default function Home() {
                 setFetchError(true);
             });
     };
+    const getWeather = (foundCapitalElement, dataCallback) => {
+        fetch(
+            `https://api.openweathermap.org/data/2.5/weather?q=${foundCapitalElement}&appid=${process.env.NEXT_PUBLIC_WEATHERAPI}`
+        )
+            .then((res) => {
+                if (!res.ok) {
+                    throw Error("Could not fetch data");
+                }
+                return res.json();
+            })
+            .then((data) => {
+                console.log("weatherDataApi details: ", {
+                    data,
+                    dataName: data.name,
+                    dataWeather: data.weather,
+                });
+                const weatherDetails = data.weather.map((detail) => {
+                    return detail.main;
+                });
+                console.log("weatherDetails: ", weatherDetails);
 
+                dataCallback(weatherDetails);
+            })
+            .catch((err) => {
+                console.log("error", err);
+                setFetchError(true);
+            })
+            .finally(() => {
+                setIsSaveLoading(false);
+                setIsLoading(false)
+            });
+    };
 
     useEffect(() => {
         getCapital();
     }, []);
 
     const findCapital = (providedCountry) => {
-
         const dataApi = dataCountriesApi?.data;
         //Find the value of the first element
         const foundCountry = dataApi?.find((item) => {
@@ -84,71 +113,45 @@ export default function Home() {
             setError(false);
         }
 
-        console.log("detailsDataList", detailsDataList)
+        console.log("detailsDataList", detailsDataList);
 
         const found = detailsDataList.find((elem) => {
-            return elem.country === valueInput
-        })
+            return elem.country === valueInput;
+        });
 
         if (found) {
-            setErrorFoundTheSameCountry(true)
+            setErrorFoundTheSameCountry(true);
             return;
         }
 
-        console.log('found ele', found)
+        console.log("found ele", found);
 
         setIsLoading(true);
 
         const foundCapitalElement = findCapital(valueInput);
 
         if (foundCapitalElement === undefined) {
-            setErrorNotFoundCapital(true)
+            setErrorNotFoundCapital(true);
             setValueInput("");
             setIsLoading(false);
             return;
         }
 
         // Second API to get Weather info
+        // Second API to get Weather info
         if (foundCapitalElement) {
-            fetch(
-                `https://api.openweathermap.org/data/2.5/weather?q=${foundCapitalElement}&appid=${process.env.NEXT_PUBLIC_WEATHERAPI}`
-            )
-                .then((res) => {
-                    if (!res.ok) {
-                        throw Error("Could not fetch data");
-                    }
-                    return res.json();
-                })
-                .then((data) => {
-                    console.log("weatherDataApi details: ", {
-                        data,
-                        dataName: data.name,
-                        dataWeather: data.weather,
-                    });
-                    const weatherDetails = data.weather.map((detail) => {
-                        return detail.main;
-                    });
-                    console.log("weatherDetails: ", weatherDetails);
+            getWeather(foundCapitalElement, (weatherDetails) => {
+                const newElementDetail = {
+                    country: valueInput,
+                    capital: foundCapitalElement,
+                    weather: weatherDetails,
+                    id: uuidv4(),
+                };
 
-                    const newElementDetail = {
-                        country: valueInput,
-                        capital: foundCapitalElement,
-                        weather: weatherDetails,
-                        id: uuidv4(),
-                    };
-
-                    setDetailsDataList((prevState) => {
-                        return [...prevState, newElementDetail];
-                    });
-                })
-                .catch((err) => {
-                    console.log("error", err);
-                    setFetchError(true);
-                })
-                .finally(() => {
-                    setIsLoading(false);
-                    setErrorNotFoundCapital(false)
+                setDetailsDataList((prevState) => {
+                    return [...prevState, newElementDetail];
                 });
+            });
         }
 
         setValueInput("");
@@ -207,40 +210,15 @@ export default function Home() {
         const foundCapitalElement = findCapital(inputSaveValue);
 
         // Second API to get Weather info
+        // Second API to get Weather info
         if (foundCapitalElement) {
-            fetch(
-                `https://api.openweathermap.org/data/2.5/weather?q=${foundCapitalElement}&appid=${process.env.NEXT_PUBLIC_WEATHERAPI}`
-            )
-                .then((res) => {
-                    if (!res.ok) {
-                        throw Error("Could not fetch data");
-                    }
-                    return res.json();
-                })
-                .then((data) => {
-                    console.log("weatherDataApi details: ", {
-                        data,
-                        dataName: data.name,
-                        dataWeather: data.weather,
-                    });
-                    const weatherDetails = data.weather.map((detail) => {
-                        return detail.main;
-                    });
-                    console.log("weatherDetails: ", weatherDetails);
+            getWeather(foundCapitalElement, (weatherDetails) => {
+                findElement.weather = weatherDetails;
+                findElement.capital = foundCapitalElement;
 
-                    findElement.weather = weatherDetails;
-                    findElement.capital = foundCapitalElement;
-
-                    setSavedIDEditElement(null);
-                    setDetailsDataList([...detailsDataList]);
-                })
-                .catch((err) => {
-                    console.log("error", err);
-                    setFetchError(true);
-                })
-                .finally(() => {
-                    setIsSaveLoading(false);
-                });
+                setSavedIDEditElement(null);
+                setDetailsDataList([...detailsDataList]);
+            });
         }
     };
 
@@ -303,7 +281,9 @@ export default function Home() {
                                                                 index={index}
                                                                 inputSaveValue={inputSaveValue}
                                                                 handleSave={handleSave}
-                                                                handlerChangeSaveEditing={handlerChangeSaveEditing}
+                                                                handlerChangeSaveEditing={
+                                                                    handlerChangeSaveEditing
+                                                                }
                                                             />
                                                         ) : (
                                                             <SingleTemplate
@@ -321,8 +301,12 @@ export default function Home() {
                                 </div>
                                 {error && <p>Please write the name of country </p>}
                                 {fetchError && <p>Something went wrong with API Call </p>}
-                                {errorNotFoundCapita && <p>Sorry Not found Country, Please write again </p>}
-                                {errorFoundTheSameCountry && <p>there is it on the our list </p>}
+                                {errorNotFoundCapita && (
+                                    <p>Sorry Not found Country, Please write again </p>
+                                )}
+                                {errorFoundTheSameCountry && (
+                                    <p>there is it on the our list </p>
+                                )}
                             </div>
 
                             <div className="container-search">
@@ -332,35 +316,37 @@ export default function Home() {
                                         placeholder="search..."
                                         type="text"
                                         id="country-search"
-                                        onChange={event => { setSearchValueInput(event.target.value) }}
+                                        onChange={(event) => {
+                                            setSearchValueInput(event.target.value);
+                                        }}
                                     />
                                 </div>
                                 {/* displaying search value */}
                                 <div>
-                                    {detailsDataList.filter((value) => {
-                                        if (searchValueInput == "") {
-                                            return false
-                                        } else if (value.country.toLowerCase().includes(searchValueInput.toLowerCase())) {
-                                            return true
-                                        }
-                                    }).map((elem, index) => {
-                                        return (
-                                            <div className="searched-wrapper" key={index}>
-                                                <p>{elem.country}</p>
-                                                <p>{elem.capital}</p>
-                                                <p>{elem.weather}</p>
-                                            </div>)
-
-                                    })}
-
+                                    {detailsDataList
+                                        .filter((value) => {
+                                            if (searchValueInput == "") {
+                                                return false;
+                                            } else if (
+                                                value.country
+                                                    .toLowerCase()
+                                                    .includes(searchValueInput.toLowerCase())
+                                            ) {
+                                                return true;
+                                            }
+                                        })
+                                        .map((elem, index) => {
+                                            return (
+                                                <div className="searched-wrapper" key={index}>
+                                                    <p>{elem.country}</p>
+                                                    <p>{elem.capital}</p>
+                                                    <p>{elem.weather}</p>
+                                                </div>
+                                            );
+                                        })}
                                 </div>
                             </div>
                         </div>
-
-
-
-
-
                     </form>
                 </div>
             </main>
